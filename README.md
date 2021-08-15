@@ -2,7 +2,7 @@
 Learn the basics of database design, to begin with a Key/Value store
 
 # Understand various aspects of database design including - 
-+ Disk Access patterns
++ Disk access patterns
 + Working of HDDs and SSDs
 + Binary format to represent data
 + Basics of block and page
