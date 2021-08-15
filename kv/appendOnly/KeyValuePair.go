@@ -16,10 +16,10 @@ type keyValueLogContent struct {
 	value     string
 }
 
-const size = unsafe.Sizeof(keyValueLogContent{})
+const KeyValueContentSize = unsafe.Sizeof(keyValueLogContent{})
 
 func (keyValuePair KeyValuePair) Serialize() []byte {
-	bytes := make([]byte, size)
+	bytes := make([]byte, KeyValueContentSize)
 	content := (*keyValueLogContent)(unsafe.Pointer(&bytes[0]))
 
 	content.keySize = keyValuePair.keySize()
@@ -31,7 +31,11 @@ func (keyValuePair KeyValuePair) Serialize() []byte {
 }
 
 func DeserializeFrom(bytes []byte) KeyValuePair {
-	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[0]))
+	return DeserializeFromOffset(bytes, 0)
+}
+
+func DeserializeFromOffset(bytes []byte, offset int64) KeyValuePair {
+	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[offset]))
 	return KeyValuePair{
 		Key:   keyValueLogContent.key,
 		Value: keyValueLogContent.value,
