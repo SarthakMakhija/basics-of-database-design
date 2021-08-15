@@ -40,10 +40,6 @@ func (fileIO *MutableFileIO) WriteAt(offset Offset, bytes []byte) Offset {
 		return -1
 	}
 
-	if fileIO.Err != nil {
-		return -1
-	}
-
 	defer syscall.Close(int(fileIO.File.Fd()))
 
 	bytesWritten, err := fileIO.File.WriteAt(bytes, int64(offset))
