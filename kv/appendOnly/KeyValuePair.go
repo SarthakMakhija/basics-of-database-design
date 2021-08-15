@@ -42,6 +42,17 @@ func DeserializeFromOffset(bytes []byte, offset Offset) KeyValuePair {
 	}
 }
 
+func DeserializeAll(bytes []byte) []KeyValuePair {
+	var pairs []KeyValuePair
+
+	var offset Offset = 0
+	for offset < Offset(int64(len(bytes))) {
+		pairs = append(pairs, DeserializeFromOffset(bytes, offset))
+		offset = offset + Offset(int64(KeyValueContentSize))
+	}
+	return pairs
+}
+
 func (keyValuePair KeyValuePair) keySize() int {
 	return len(keyValuePair.Key)
 }
