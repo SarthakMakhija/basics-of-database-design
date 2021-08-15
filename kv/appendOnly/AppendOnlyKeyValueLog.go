@@ -9,11 +9,13 @@ import (
 //TODO: Handle error gracefully
 //TODO: Handle fileSize 4096
 
+type Offset int64
+
 type KeyValueLog struct {
 	fileName              string
 	logFileDescriptor     uintptr
 	mappedBytes           []byte
-	currentStartingOffset int64
+	currentStartingOffset Offset
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
@@ -36,9 +38,9 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 	}
 }
 
-func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) int64 {
+func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) Offset {
 	originalStartingOffset := keyValueLog.currentStartingOffset
-	newStartingOffset := originalStartingOffset + int64(keyValueLog.put(keyValuePair))
+	newStartingOffset := originalStartingOffset + keyValueLog.put(keyValuePair)
 	keyValueLog.currentStartingOffset = newStartingOffset
 
 	return originalStartingOffset
@@ -48,18 +50,18 @@ func (keyValueLog KeyValueLog) GetFirst() KeyValuePair {
 	return keyValueLog.GetAtStartingOffset(0)
 }
 
-func (keyValueLog KeyValueLog) GetAtStartingOffset(offset int64) KeyValuePair {
+func (keyValueLog KeyValueLog) GetAtStartingOffset(offset Offset) KeyValuePair {
 	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
 }
 
-func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) int {
+func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	file, err := os.OpenFile(keyValueLog.fileName, syscall.O_RDWR, 0600)
 	defer syscall.Close(int(file.Fd()))
 
 	if err == nil {
-		bytesWritten, err := file.WriteAt(keyValuePair.Serialize(), keyValueLog.currentStartingOffset)
+		bytesWritten, err := file.WriteAt(keyValuePair.Serialize(), int64(keyValueLog.currentStartingOffset))
 		if err == nil {
-			return bytesWritten
+			return Offset(int64(bytesWritten))
 		}
 	}
 	return 0

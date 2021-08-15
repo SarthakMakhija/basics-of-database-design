@@ -51,7 +51,7 @@ func TestPutGetSecondKeyPairToKeyValueLog(t *testing.T) {
 	log.Put(keyValuePair)
 	log.Put(anotherKeyValuePair)
 
-	readPair := log.GetAtStartingOffset(int64(appendOnly.KeyValueContentSize))
+	readPair := log.GetAtStartingOffset(appendOnly.Offset(appendOnly.KeyValueContentSize))
 	if readPair.Key != anotherKeyValuePair.Key {
 		t.Fatalf("Expected Key %v, received %v", anotherKeyValuePair.Key, readPair.Key)
 	}

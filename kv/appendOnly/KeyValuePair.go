@@ -34,7 +34,7 @@ func DeserializeFrom(bytes []byte) KeyValuePair {
 	return DeserializeFromOffset(bytes, 0)
 }
 
-func DeserializeFromOffset(bytes []byte, offset int64) KeyValuePair {
+func DeserializeFromOffset(bytes []byte, offset Offset) KeyValuePair {
 	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[offset]))
 	return KeyValuePair{
 		Key:   keyValueLogContent.key,
