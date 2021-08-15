@@ -12,7 +12,7 @@ import (
 type KeyValueLog struct {
 	fileName          string
 	logFileDescriptor uintptr
-	MappedBytes       []byte
+	mappedBytes       []byte
 	currentOffset     int64
 }
 
@@ -24,7 +24,7 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 			return KeyValueLog{
 				fileName:          fileName,
 				logFileDescriptor: file.Fd(),
-				MappedBytes:       bytes,
+				mappedBytes:       bytes,
 			}
 		} else {
 			fmt.Print(err)
@@ -36,19 +36,19 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 	}
 }
 
-func (keyValueLog *KeyValueLog) Write(keyValuePair KeyValuePair) {
-	keyValueLog.currentOffset = keyValueLog.currentOffset + int64(keyValueLog.write(keyValuePair))
+func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) {
+	keyValueLog.currentOffset = keyValueLog.currentOffset + int64(keyValueLog.add(keyValuePair))
 }
 
-func (keyValueLog KeyValueLog) ReadFirst() KeyValuePair {
-	return keyValueLog.ReadAtStartingOffset(0)
+func (keyValueLog KeyValueLog) GetFirst() KeyValuePair {
+	return keyValueLog.GetAtStartingOffset(0)
 }
 
-func (keyValueLog KeyValueLog) ReadAtStartingOffset(offset int64) KeyValuePair {
-	return DeserializeFromOffset(keyValueLog.MappedBytes, offset)
+func (keyValueLog KeyValueLog) GetAtStartingOffset(offset int64) KeyValuePair {
+	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
 }
 
-func (keyValueLog *KeyValueLog) write(keyValuePair KeyValuePair) int {
+func (keyValueLog *KeyValueLog) add(keyValuePair KeyValuePair) int {
 	file, err := os.OpenFile(keyValueLog.fileName, syscall.O_RDWR, 0600)
 	defer syscall.Close(int(file.Fd()))
 

@@ -10,7 +10,7 @@ func deleteFile(fileName string) {
 	os.Remove(fileName)
 }
 
-func TestWriteReadKeyPairToKeyValueLog(t *testing.T) {
+func TestPutGetKeyPairToKeyValueLog(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
@@ -21,9 +21,9 @@ func TestWriteReadKeyPairToKeyValueLog(t *testing.T) {
 		Value: "ThoughtWorks",
 	}
 
-	log.Write(keyValuePair)
+	log.Put(keyValuePair)
 
-	readPair := log.ReadFirst()
+	readPair := log.GetFirst()
 	if readPair.Key != keyValuePair.Key {
 		t.Fatalf("Expected Key %v, received %v", keyValuePair.Key, readPair.Key)
 	}
@@ -33,7 +33,7 @@ func TestWriteReadKeyPairToKeyValueLog(t *testing.T) {
 	}
 }
 
-func TestWriteReadSecondKeyPairToKeyValueLog(t *testing.T) {
+func TestPutGetSecondKeyPairToKeyValueLog(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
@@ -48,10 +48,10 @@ func TestWriteReadSecondKeyPairToKeyValueLog(t *testing.T) {
 		Value: "512B",
 	}
 
-	log.Write(keyValuePair)
-	log.Write(anotherKeyValuePair)
+	log.Put(keyValuePair)
+	log.Put(anotherKeyValuePair)
 
-	readPair := log.ReadAtStartingOffset(int64(appendOnly.KeyValueContentSize))
+	readPair := log.GetAtStartingOffset(int64(appendOnly.KeyValueContentSize))
 	if readPair.Key != anotherKeyValuePair.Key {
 		t.Fatalf("Expected Key %v, received %v", anotherKeyValuePair.Key, readPair.Key)
 	}
