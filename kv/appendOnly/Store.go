@@ -22,11 +22,9 @@ func (store Store) Get(key []byte) []byte {
 }
 
 func createOrLoadInMemoryKeyValueOffsetTable(keyValueLog KeyValueLog) InMemoryKeyValueOffsetTable {
-	var inMemoryKeyValueTable InMemoryKeyValueOffsetTable
 	if keyValueLog.IsANewlyCreatedKeyValueLog() {
-		inMemoryKeyValueTable = NewInMemoryKeyValueOffsetTable(&keyValueLog)
+		return NewInMemoryKeyValueOffsetTable(&keyValueLog)
 	} else {
-		inMemoryKeyValueTable = ReloadFrom(&keyValueLog)
+		return ReloadFrom(&keyValueLog)
 	}
-	return inMemoryKeyValueTable
 }
