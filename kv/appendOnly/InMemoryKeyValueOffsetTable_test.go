@@ -39,3 +39,38 @@ func TestGetValueByNonExistentKey(t *testing.T) {
 		t.Fatalf("Expected %v, received %v", expectedValue, value)
 	}
 }
+
+func TestReloadInMemoryKeyValueOffsetTableFromKeyValueLog(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	log := newKeyValueLog(fileName)
+	log.Put(appendOnly.KeyValuePair{Key: []byte("Company"), Value: []byte("ThoughtWorks")})
+
+	inMemoryKeyValueTable := appendOnly.ReloadFrom(log)
+	value := inMemoryKeyValueTable.Get([]byte("Company"))
+
+	expectedValue := []byte("ThoughtWorks")
+
+	if !bytes.Equal(value, expectedValue) {
+		t.Fatalf("Expected %v, received %v", expectedValue, value)
+	}
+}
+
+func TestReloadInMemoryKeyValueOffsetTableFromKeyValueLogWithMultipleKeyValues(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	log := newKeyValueLog(fileName)
+	log.Put(appendOnly.KeyValuePair{Key: []byte("Company"), Value: []byte("ThoughtWorks")})
+	log.Put(appendOnly.KeyValuePair{Key: []byte("Sector"), Value: []byte("454")})
+
+	inMemoryKeyValueTable := appendOnly.ReloadFrom(log)
+	value := inMemoryKeyValueTable.Get([]byte("Sector"))
+
+	expectedValue := []byte("454")
+
+	if !bytes.Equal(value, expectedValue) {
+		t.Fatalf("Expected %v, received %v", expectedValue, value)
+	}
+}
