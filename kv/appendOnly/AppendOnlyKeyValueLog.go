@@ -62,8 +62,10 @@ func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	return offset
 }
 
-func (keyValueLog *KeyValueLog) FileName() string {
-	return keyValueLog.fileName
+func (keyValueLog *KeyValueLog) Close() {
+	fileIO := NewFileIO()
+	fileIO.File = keyValueLog.file
+	fileIO.CloseSilently()
 }
 
 func createOrOpen(fileName string) *MutableFileIO {

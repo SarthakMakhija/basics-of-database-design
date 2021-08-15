@@ -34,3 +34,7 @@ func (table InMemoryKeyValueOffsetTable) Get(key []byte) []byte {
 	}
 	return []byte{}
 }
+
+func (table InMemoryKeyValueOffsetTable) Close() {
+	table.keyValueLog.Close()
+}

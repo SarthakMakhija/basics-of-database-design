@@ -73,3 +73,24 @@ func TestPutMultipleKeyValuesInStoreGivenInMemoryTableGetsReloaded(t *testing.T)
 		t.Fatalf("Expected %v, received %v", expectedValue, value)
 	}
 }
+
+func TestPutMultipleKeyValuesInStoreGivenInMemoryTableGetsReloadedAfterClose(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	store := appendOnly.Open(fileName)
+
+	store.Put([]byte("Company"), []byte("ThoughtWorks"))
+	store.Put([]byte("Sector"), []byte("454"))
+	store.Put([]byte("StoreType"), []byte("KeyValue"))
+	store.Close()
+
+	reOpenedStore := appendOnly.Open(fileName)
+	value := reOpenedStore.Get([]byte("StoreType"))
+
+	expectedValue := []byte("KeyValue")
+
+	if !bytes.Equal(value, expectedValue) {
+		t.Fatalf("Expected %v, received %v", expectedValue, value)
+	}
+}

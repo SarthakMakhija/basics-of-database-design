@@ -13,6 +13,10 @@ func Open(fileName string) Store {
 	}
 }
 
+func (store Store) Close() {
+	store.inMemoryKeyValueTable.Close()
+}
+
 func (store Store) Put(key []byte, value []byte) {
 	store.inMemoryKeyValueTable.Put(key, value)
 }

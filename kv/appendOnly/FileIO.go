@@ -40,7 +40,7 @@ func (fileIO *MutableFileIO) WriteAt(offset Offset, bytes []byte) Offset {
 		return -1
 	}
 
-	defer syscall.Close(int(fileIO.File.Fd()))
+	defer fileIO.CloseSilently()
 
 	bytesWritten, err := fileIO.File.WriteAt(bytes, int64(offset))
 	if err != nil {
@@ -71,4 +71,8 @@ func (fileIO *MutableFileIO) FileSize(fileName string) int64 {
 		return -1
 	}
 	return stat.Size()
+}
+
+func (fileIO *MutableFileIO) CloseSilently() {
+	_ = fileIO.File.Close()
 }
