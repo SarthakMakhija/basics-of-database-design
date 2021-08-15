@@ -1,8 +1,6 @@
 package appendOnly
 
 import (
-	"fmt"
-	"os"
 	"syscall"
 )
 
@@ -19,23 +17,16 @@ type KeyValueLog struct {
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
-	file, err := createFile(fileName)
-	if err == nil {
-		bytes, err := mMap(file, 4096)
-		if err == nil {
-			return KeyValueLog{
-				fileName:          fileName,
-				logFileDescriptor: file.Fd(),
-				mappedBytes:       bytes,
-			}
-		} else {
-			fmt.Print(err)
-			panic("handle later")
+	fileIO := createFile(fileName)
+	bytes := fileIO.Mmap(fileIO.file, 4096)
+	if fileIO.err == nil {
+		return KeyValueLog{
+			fileName:          fileName,
+			logFileDescriptor: fileIO.file.Fd(),
+			mappedBytes:       bytes,
 		}
-	} else {
-		fmt.Print(err)
-		panic("handle later")
 	}
+	return KeyValueLog{}
 }
 
 func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) Offset {
@@ -55,26 +46,15 @@ func (keyValueLog KeyValueLog) GetAtStartingOffset(offset Offset) KeyValuePair {
 }
 
 func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
-	file, err := os.OpenFile(keyValueLog.fileName, syscall.O_RDWR, 0600)
-	defer syscall.Close(int(file.Fd()))
+	fileIO := NewFileIO()
 
-	if err == nil {
-		bytesWritten, err := file.WriteAt(keyValuePair.Serialize(), int64(keyValueLog.currentStartingOffset))
-		if err == nil {
-			return Offset(int64(bytesWritten))
-		}
-	}
-	return 0
+	fileIO.Open(keyValueLog.fileName, syscall.O_RDWR, 0600)
+	offset := fileIO.WriteAt(keyValueLog.currentStartingOffset, keyValuePair.Serialize())
+	return offset
 }
 
-func createFile(fileName string) (*os.File, error) {
-	return os.Create(fileName)
-}
-
-func mMap(file *os.File, fileSize int) ([]byte, error) {
-	bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSize, syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil {
-		return nil, err
-	}
-	return bytes, nil
+func createFile(fileName string) *FileIO {
+	fileIO := NewFileIO()
+	fileIO.Create(fileName)
+	return fileIO
 }
