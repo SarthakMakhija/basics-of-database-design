@@ -10,10 +10,10 @@ import (
 //TODO: Handle fileSize 4096
 
 type KeyValueLog struct {
-	fileName          string
-	logFileDescriptor uintptr
-	mappedBytes       []byte
-	currentOffset     int64
+	fileName              string
+	logFileDescriptor     uintptr
+	mappedBytes           []byte
+	currentStartingOffset int64
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
@@ -37,8 +37,10 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 }
 
 func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) int64 {
-	originalStartingOffset := keyValueLog.currentOffset
-	keyValueLog.currentOffset = keyValueLog.currentOffset + int64(keyValueLog.add(keyValuePair))
+	originalStartingOffset := keyValueLog.currentStartingOffset
+	newStartingOffset := keyValueLog.currentStartingOffset + int64(keyValueLog.add(keyValuePair))
+	keyValueLog.currentStartingOffset = newStartingOffset
+
 	return originalStartingOffset
 }
 
@@ -55,7 +57,7 @@ func (keyValueLog *KeyValueLog) add(keyValuePair KeyValuePair) int {
 	defer syscall.Close(int(file.Fd()))
 
 	if err == nil {
-		bytesWritten, err := file.WriteAt(keyValuePair.Serialize(), keyValueLog.currentOffset)
+		bytesWritten, err := file.WriteAt(keyValuePair.Serialize(), keyValueLog.currentStartingOffset)
 		if err == nil {
 			return bytesWritten
 		}
