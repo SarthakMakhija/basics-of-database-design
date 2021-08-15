@@ -5,8 +5,9 @@ import (
 )
 
 type KeyValuePair struct {
-	Key   []byte
-	Value []byte
+	Key            []byte
+	Value          []byte
+	startingOffset Offset
 }
 
 type keyValueLogContent struct {
@@ -37,8 +38,9 @@ func DeserializeFrom(bytes []byte) KeyValuePair {
 func DeserializeFromOffset(bytes []byte, offset Offset) KeyValuePair {
 	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[offset]))
 	return KeyValuePair{
-		Key:   keyValueLogContent.key,
-		Value: keyValueLogContent.value,
+		Key:            keyValueLogContent.key,
+		Value:          keyValueLogContent.value,
+		startingOffset: offset,
 	}
 }
 
