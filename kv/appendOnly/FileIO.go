@@ -61,3 +61,14 @@ func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileM
 	}
 	fileIO.File = file
 }
+
+func (fileIO *MutableFileIO) FileSize(fileName string) int64 {
+	if fileIO.Err != nil {
+		return -1
+	}
+	stat, err := os.Stat(fileName)
+	if err != nil {
+		return -1
+	}
+	return stat.Size()
+}

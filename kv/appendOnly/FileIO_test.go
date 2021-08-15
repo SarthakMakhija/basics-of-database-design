@@ -123,3 +123,31 @@ func TestDoesNotMemoryMapANonExistentFile(t *testing.T) {
 		t.Fatalf("Expected %v, received %v", nil, mappedBytes)
 	}
 }
+
+func TestReturnsTheFileSize(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+
+	fileIO.CreateOrOpen(fileName)
+	size := fileIO.FileSize(fileName)
+
+	if size != 0 {
+		t.Fatalf("Expected %v, received %v", 0, size)
+	}
+}
+
+func TestDoesNotReturnTheFileSizeOfDirectory(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "/"
+
+	defer deleteFile(fileName)
+
+	fileIO.CreateOrOpen(fileName)
+	size := fileIO.FileSize(fileName)
+
+	if size != -1 {
+		t.Fatalf("Expected %v, received %v", -1, size)
+	}
+}
