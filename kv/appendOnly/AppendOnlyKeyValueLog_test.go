@@ -7,7 +7,7 @@ import (
 )
 
 func deleteFile(fileName string) {
-	os.Remove(fileName)
+	_ = os.Remove(fileName)
 }
 
 func TestPutGetKeyPairToKeyValueLog(t *testing.T) {
@@ -58,5 +58,31 @@ func TestPutGetSecondKeyPairToKeyValueLog(t *testing.T) {
 
 	if readPair.Value != anotherKeyValuePair.Value {
 		t.Fatalf("Expected Value %v, received %v", anotherKeyValuePair.Value, readPair.Value)
+	}
+}
+
+func TestReturnsTrueGivenItIsANewlyCreatedKeyValueLog(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	log := appendOnly.NewKeyValueLog(fileName)
+	if log.IsANewlyCreatedKeyValueLog() != true {
+		t.Fatalf("Expected true, received false")
+	}
+}
+
+func TestReturnsFalseGivenItIsNotANewlyCreatedKeyValueLog(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	log := appendOnly.NewKeyValueLog(fileName)
+	keyValuePair := appendOnly.KeyValuePair{
+		Key:   "Company",
+		Value: "ThoughtWorks",
+	}
+	log.Put(keyValuePair)
+
+	if log.IsANewlyCreatedKeyValueLog() != false {
+		t.Fatalf("Expected false, received true")
 	}
 }

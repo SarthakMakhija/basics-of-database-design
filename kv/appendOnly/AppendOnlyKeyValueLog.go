@@ -45,6 +45,14 @@ func (keyValueLog KeyValueLog) GetAtStartingOffset(offset Offset) KeyValuePair {
 	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
 }
 
+func (keyValueLog KeyValueLog) IsANewlyCreatedKeyValueLog() bool {
+	fileIO := NewFileIO()
+	if fileIO.FileSize(keyValueLog.fileName) > 0 {
+		return false
+	}
+	return true
+}
+
 func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	fileIO := NewFileIO()
 
