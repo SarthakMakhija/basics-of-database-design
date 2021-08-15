@@ -39,10 +39,6 @@ func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) Offset {
 	return originalStartingOffset
 }
 
-func (keyValueLog KeyValueLog) GetFirst() KeyValuePair {
-	return keyValueLog.GetAtStartingOffset(0)
-}
-
 func (keyValueLog KeyValueLog) GetAtStartingOffset(offset Offset) KeyValuePair {
 	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
 }
@@ -55,20 +51,12 @@ func (keyValueLog KeyValueLog) IsANewlyCreatedKeyValueLog() bool {
 	return true
 }
 
-func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
-	fileIO := NewFileIO()
-
-	fileIO.Open(keyValueLog.fileName, syscall.O_RDWR, 0600)
-	offset := fileIO.WriteAt(keyValueLog.currentStartingOffset, keyValuePair.Serialize())
-	return offset
-}
-
 func (keyValueLog *KeyValueLog) Close() {
 	fileIO := NewFileIO()
 	fileIO.File = keyValueLog.file
 
 	fileIO.Munmap(keyValueLog.mappedBytes)
-	assert.Assert(fileIO.Err == nil, "Error must be nil in fileIO after unmap")
+	assert.Assert(fileIO.Err == nil, "FileIO must not contain any Error after unmap")
 	fileIO.CloseSilently()
 }
 
@@ -76,4 +64,12 @@ func createOrOpen(fileName string) *MutableFileIO {
 	fileIO := NewFileIO()
 	fileIO.CreateOrOpen(fileName)
 	return fileIO
+}
+
+func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
+	fileIO := NewFileIO()
+
+	fileIO.Open(keyValueLog.fileName, syscall.O_RDWR, 0600)
+	offset := fileIO.WriteAt(keyValueLog.currentStartingOffset, keyValuePair.Serialize())
+	return offset
 }

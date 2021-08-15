@@ -24,7 +24,7 @@ func TestPutGetKeyPairToKeyValueLog(t *testing.T) {
 
 	log.Put(keyValuePair)
 
-	readPair := log.GetFirst()
+	readPair := log.GetAtStartingOffset(0)
 	if !bytes.Equal(readPair.Key, keyValuePair.Key) {
 		t.Fatalf("Expected Key %v, received %v", keyValuePair.Key, readPair.Key)
 	}
