@@ -124,6 +124,40 @@ func TestDoesNotMemoryMapANonExistentFile(t *testing.T) {
 	}
 }
 
+func TestUnMapsAFile(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+
+	fileIO.CreateOrOpen(fileName)
+	fileIO.Open(fileName, os.O_RDWR, 0600)
+	content := []byte{'h', 'e', 'l', 'l', 'o'}
+	fileIO.WriteAt(0, content)
+
+	fileIO.Open(fileName, os.O_RDONLY, 0400)
+	mappedBytes := fileIO.Mmap(fileIO.File, 5)
+	fileIO.Munmap(mappedBytes)
+
+	if fileIO.Err != nil {
+		t.Fatalf("Expected no error while unmapping but received %v", fileIO.Err)
+	}
+}
+
+func TestDoesNotUnMapANonExistentFile(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+
+	fileIO.Open(fileName, os.O_RDWR, 0600)
+	fileIO.Munmap([]byte{'a', 'b'})
+
+	if fileIO.Err == nil {
+		t.Fatalf("Expected error while unmapping but received none")
+	}
+}
+
 func TestReturnsTheFileSize(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "./kv.test"

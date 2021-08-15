@@ -35,6 +35,16 @@ func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
 	return bytes
 }
 
+func (fileIO *MutableFileIO) Munmap(bytes []byte) {
+	if fileIO.Err != nil {
+		return
+	}
+	err := syscall.Munmap(bytes)
+	if err != nil {
+		fileIO.Err = err
+	}
+}
+
 func (fileIO *MutableFileIO) WriteAt(offset Offset, bytes []byte) Offset {
 	if fileIO.Err != nil {
 		return -1
