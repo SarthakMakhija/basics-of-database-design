@@ -25,6 +25,8 @@ func createOrLoadInMemoryKeyValueOffsetTable(keyValueLog KeyValueLog) InMemoryKe
 	var inMemoryKeyValueTable InMemoryKeyValueOffsetTable
 	if keyValueLog.IsANewlyCreatedKeyValueLog() {
 		inMemoryKeyValueTable = NewInMemoryKeyValueOffsetTable(&keyValueLog)
+	} else {
+		inMemoryKeyValueTable = ReloadFrom(&keyValueLog)
 	}
 	return inMemoryKeyValueTable
 }
