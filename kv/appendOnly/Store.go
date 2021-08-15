@@ -6,7 +6,7 @@ type Store struct {
 
 func Open(fileName string) Store {
 	keyValueLog := NewKeyValueLog(fileName)
-	inMemoryKeyValueTable := NewInMemoryKeyValueOffsetTable(&keyValueLog)
+	inMemoryKeyValueTable := createOrLoadInMemoryKeyValueOffsetTable(keyValueLog)
 
 	return Store{
 		inMemoryKeyValueTable: &inMemoryKeyValueTable,
@@ -19,4 +19,12 @@ func (store Store) Put(key string, value string) {
 
 func (store Store) Get(key string) string {
 	return store.inMemoryKeyValueTable.Get(key)
+}
+
+func createOrLoadInMemoryKeyValueOffsetTable(keyValueLog KeyValueLog) InMemoryKeyValueOffsetTable {
+	var inMemoryKeyValueTable InMemoryKeyValueOffsetTable
+	if keyValueLog.IsANewlyCreatedKeyValueLog() {
+		inMemoryKeyValueTable = NewInMemoryKeyValueOffsetTable(&keyValueLog)
+	}
+	return inMemoryKeyValueTable
 }
