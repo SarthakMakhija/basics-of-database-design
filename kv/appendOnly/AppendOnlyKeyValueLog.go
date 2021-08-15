@@ -36,8 +36,10 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 	}
 }
 
-func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) {
+func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) int64 {
+	originalStartingOffset := keyValueLog.currentOffset
 	keyValueLog.currentOffset = keyValueLog.currentOffset + int64(keyValueLog.add(keyValuePair))
+	return originalStartingOffset
 }
 
 func (keyValueLog KeyValueLog) GetFirst() KeyValuePair {
