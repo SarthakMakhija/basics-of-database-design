@@ -1,23 +1,23 @@
 package appendOnly
 
-type InMemoryKeyValueTable struct {
+type InMemoryKeyValueOffsetTable struct {
 	offsetByKey map[string]Offset
 	keyValueLog *KeyValueLog
 }
 
-func NewInMemoryKeyValueTable(keyValueLog *KeyValueLog) InMemoryKeyValueTable {
-	return InMemoryKeyValueTable{
+func NewInMemoryKeyValueOffsetTable(keyValueLog *KeyValueLog) InMemoryKeyValueOffsetTable {
+	return InMemoryKeyValueOffsetTable{
 		offsetByKey: make(map[string]Offset),
 		keyValueLog: keyValueLog,
 	}
 }
 
-func (table InMemoryKeyValueTable) Put(key string, value string) {
+func (table InMemoryKeyValueOffsetTable) Put(key string, value string) {
 	startingOffset := table.keyValueLog.Put(KeyValuePair{Key: key, Value: value})
 	table.offsetByKey[key] = startingOffset
 }
 
-func (table InMemoryKeyValueTable) Get(key string) string {
+func (table InMemoryKeyValueOffsetTable) Get(key string) string {
 	offset, exists := table.offsetByKey[key]
 	if exists {
 		return table.keyValueLog.GetAtStartingOffset(offset).Value

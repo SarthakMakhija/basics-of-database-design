@@ -14,7 +14,7 @@ func TestPutValueByKey(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
-	inMemoryKeyValueTable := appendOnly.NewInMemoryKeyValueTable(newKeyValueLog(fileName))
+	inMemoryKeyValueTable := appendOnly.NewInMemoryKeyValueOffsetTable(newKeyValueLog(fileName))
 	inMemoryKeyValueTable.Put("sectorSize", "512B")
 
 	value := inMemoryKeyValueTable.Get("sectorSize")
@@ -29,7 +29,7 @@ func TestGetValueByNonExistentKey(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
-	emptyInMemoryKeyValueTable := appendOnly.NewInMemoryKeyValueTable(newKeyValueLog(fileName))
+	emptyInMemoryKeyValueTable := appendOnly.NewInMemoryKeyValueOffsetTable(newKeyValueLog(fileName))
 
 	value := emptyInMemoryKeyValueTable.Get("sectorSize")
 	expectedValue := ""

@@ -1,12 +1,12 @@
 package appendOnly
 
 type Store struct {
-	inMemoryKeyValueTable *InMemoryKeyValueTable
+	inMemoryKeyValueTable *InMemoryKeyValueOffsetTable
 }
 
 func Open(fileName string) Store {
 	keyValueLog := NewKeyValueLog(fileName)
-	inMemoryKeyValueTable := NewInMemoryKeyValueTable(&keyValueLog)
+	inMemoryKeyValueTable := NewInMemoryKeyValueOffsetTable(&keyValueLog)
 
 	return Store{
 		inMemoryKeyValueTable: &inMemoryKeyValueTable,
