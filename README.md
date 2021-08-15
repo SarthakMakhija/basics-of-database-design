@@ -23,3 +23,4 @@ Learn the basics of database design, to begin with a Key/Value store
 + Current implementation accesses the key/value log file randomly while getting a value, which could result in a page fault if the corresponding page is not already memory mapped
 + Current implementation has NO concept of page, transaction or concurrency
 + Current implementation (re)loads the entire append only key/value log, if the Key/Value store is restarted
++ Size of memory mapped file is hardcoded 4096bytes
