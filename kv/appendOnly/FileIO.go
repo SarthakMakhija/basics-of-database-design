@@ -5,59 +5,63 @@ import (
 	"syscall"
 )
 
-type FileIO struct {
-	file *os.File
-	err  error
+type MutableFileIO struct {
+	File *os.File
+	Err  error
 }
 
-func NewFileIO() *FileIO {
-	return &FileIO{}
+func NewFileIO() *MutableFileIO {
+	return &MutableFileIO{}
 }
 
-func (fileIO *FileIO) Create(fileName string) {
+func (fileIO *MutableFileIO) Create(fileName string) {
 	file, err := os.Create(fileName)
 	if err != nil {
-		fileIO.err = err
+		fileIO.Err = err
 		return
 	}
-	fileIO.file = file
+	fileIO.File = file
 }
 
-func (fileIO *FileIO) Open(fileName string, flag int, permission os.FileMode) {
-	if fileIO.err != nil {
-		return
-	}
-	file, err := os.OpenFile(fileName, flag, permission)
-	if err != nil {
-		fileIO.err = err
-		return
-	}
-	fileIO.file = file
-}
-
-func (fileIO *FileIO) Mmap(file *os.File, fileSize int) []byte {
-	if fileIO.err != nil {
+func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
+	if fileIO.Err != nil {
 		return nil
 	}
-	bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSize, syscall.PROT_READ, syscall.MAP_SHARED)
+	bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
-		fileIO.err = err
+		fileIO.Err = err
 		return nil
 	}
 	return bytes
 }
 
-func (fileIO *FileIO) WriteAt(offset Offset, bytes []byte) Offset {
-	if fileIO.err != nil {
-		return 0
+func (fileIO *MutableFileIO) WriteAt(offset Offset, bytes []byte) Offset {
+	if fileIO.Err != nil {
+		return -1
 	}
 
-	defer syscall.Close(int(fileIO.file.Fd()))
+	if fileIO.Err != nil {
+		return -1
+	}
 
-	bytesWritten, err := fileIO.file.WriteAt(bytes, int64(offset))
+	defer syscall.Close(int(fileIO.File.Fd()))
+
+	bytesWritten, err := fileIO.File.WriteAt(bytes, int64(offset))
 	if err != nil {
-		fileIO.err = err
+		fileIO.Err = err
 		return -1
 	}
 	return Offset(int64(bytesWritten))
+}
+
+func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileMode) {
+	if fileIO.Err != nil {
+		return
+	}
+	file, err := os.OpenFile(fileName, flag, permission)
+	if err != nil {
+		fileIO.Err = err
+		return
+	}
+	fileIO.File = file
 }

@@ -18,11 +18,11 @@ type KeyValueLog struct {
 
 func NewKeyValueLog(fileName string) KeyValueLog {
 	fileIO := createFile(fileName)
-	bytes := fileIO.Mmap(fileIO.file, 4096)
-	if fileIO.err == nil {
+	bytes := fileIO.Mmap(fileIO.File, 4096)
+	if fileIO.Err == nil {
 		return KeyValueLog{
 			fileName:          fileName,
-			logFileDescriptor: fileIO.file.Fd(),
+			logFileDescriptor: fileIO.File.Fd(),
 			mappedBytes:       bytes,
 		}
 	}
@@ -53,7 +53,7 @@ func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	return offset
 }
 
-func createFile(fileName string) *FileIO {
+func createFile(fileName string) *MutableFileIO {
 	fileIO := NewFileIO()
 	fileIO.Create(fileName)
 	return fileIO
