@@ -1,47 +1,48 @@
 package appendOnly_test
 
 import (
+	"bytes"
 	"github.com/SarthakMakhija/basics-of-database-design/kv/appendOnly"
 	"testing"
 )
 
 func TestSerializeKey(t *testing.T) {
 	pair := appendOnly.KeyValuePair{
-		Key: "Sector",
+		Key: []byte("Sector"),
 	}
-	bytes := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(bytes)
+	serialized := pair.Serialize()
+	deserializedPair := appendOnly.DeserializeFrom(serialized)
 
-	if deserializedPair.Key != pair.Key {
+	if !bytes.Equal(deserializedPair.Key, pair.Key) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
 	}
 }
 
 func TestSerializeValue(t *testing.T) {
 	pair := appendOnly.KeyValuePair{
-		Value: "512B",
+		Value: []byte("512B"),
 	}
-	bytes := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(bytes)
+	serialized := pair.Serialize()
+	deserializedPair := appendOnly.DeserializeFrom(serialized)
 
-	if deserializedPair.Value != pair.Value {
+	if !bytes.Equal(deserializedPair.Value, pair.Value) {
 		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
 	}
 }
 
 func TestSerializeKeyValue(t *testing.T) {
 	pair := appendOnly.KeyValuePair{
-		Key:   "Sector",
-		Value: "512B",
+		Key:   []byte("Sector"),
+		Value: []byte("512B"),
 	}
-	bytes := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(bytes)
+	serialized := pair.Serialize()
+	deserializedPair := appendOnly.DeserializeFrom(serialized)
 
-	if deserializedPair.Key != pair.Key {
+	if !bytes.Equal(deserializedPair.Key, pair.Key) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
 	}
 
-	if deserializedPair.Value != pair.Value {
+	if !bytes.Equal(deserializedPair.Value, pair.Value) {
 		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
 	}
 }

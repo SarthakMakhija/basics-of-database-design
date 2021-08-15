@@ -5,15 +5,15 @@ import (
 )
 
 type KeyValuePair struct {
-	Key   string
-	Value string
+	Key   []byte
+	Value []byte
 }
 
 type keyValueLogContent struct {
 	keySize   int
-	key       string
+	key       []byte
 	valueSize int
-	value     string
+	value     []byte
 }
 
 const KeyValueContentSize = unsafe.Sizeof(keyValueLogContent{})

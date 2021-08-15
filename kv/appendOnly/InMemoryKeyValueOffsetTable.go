@@ -12,15 +12,15 @@ func NewInMemoryKeyValueOffsetTable(keyValueLog *KeyValueLog) InMemoryKeyValueOf
 	}
 }
 
-func (table InMemoryKeyValueOffsetTable) Put(key string, value string) {
+func (table InMemoryKeyValueOffsetTable) Put(key []byte, value []byte) {
 	startingOffset := table.keyValueLog.Put(KeyValuePair{Key: key, Value: value})
-	table.offsetByKey[key] = startingOffset
+	table.offsetByKey[string(key)] = startingOffset
 }
 
-func (table InMemoryKeyValueOffsetTable) Get(key string) string {
-	offset, exists := table.offsetByKey[key]
+func (table InMemoryKeyValueOffsetTable) Get(key []byte) []byte {
+	offset, exists := table.offsetByKey[string(key)]
 	if exists {
 		return table.keyValueLog.GetAtStartingOffset(offset).Value
 	}
-	return ""
+	return []byte{}
 }

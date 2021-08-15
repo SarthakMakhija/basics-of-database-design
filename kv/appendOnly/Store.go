@@ -13,11 +13,11 @@ func Open(fileName string) Store {
 	}
 }
 
-func (store Store) Put(key string, value string) {
+func (store Store) Put(key []byte, value []byte) {
 	store.inMemoryKeyValueTable.Put(key, value)
 }
 
-func (store Store) Get(key string) string {
+func (store Store) Get(key []byte) []byte {
 	return store.inMemoryKeyValueTable.Get(key)
 }
 

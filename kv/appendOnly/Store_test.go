@@ -1,6 +1,7 @@
 package appendOnly_test
 
 import (
+	"bytes"
 	"github.com/SarthakMakhija/basics-of-database-design/kv/appendOnly"
 	"testing"
 )
@@ -11,11 +12,11 @@ func TestPutValueByKeyInStore(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	store.Put("Company", "Thoughtworks")
-	value := store.Get("Company")
-	expected := "Thoughtworks"
+	store.Put([]byte("Company"), []byte("Thoughtworks"))
+	value := store.Get([]byte("Company"))
+	expected := []byte("Thoughtworks")
 
-	if value != expected {
+	if !bytes.Equal(value, expected) {
 		t.Fatalf("Expected %v, received %v", expected, value)
 	}
 }
@@ -26,10 +27,10 @@ func TestGetValueByNonExistentKeyInStore(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	value := store.Get("NonExistentKey")
-	expected := ""
+	value := store.Get([]byte("NonExistentKey"))
+	var expected []byte
 
-	if value != expected {
+	if !bytes.Equal(value, expected) {
 		t.Fatalf("Expected %v, received %v", expected, value)
 	}
 }
@@ -40,16 +41,16 @@ func TestPutMultipleKeyValuesInStore(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	store.Put("Company", "Thoughtworks")
-	store.Put("Region", "us-east-1")
+	store.Put([]byte("Company"), []byte("Thoughtworks"))
+	store.Put([]byte("Region"), []byte("us-east-1"))
 
-	company := store.Get("Company")
-	if company != "Thoughtworks" {
+	company := store.Get([]byte("Company"))
+	if !bytes.Equal(company, []byte("Thoughtworks")) {
 		t.Fatalf("Expected %v, received %v", "Thoughtworks", company)
 	}
 
-	region := store.Get("Region")
-	if region != "us-east-1" {
+	region := store.Get([]byte("Region"))
+	if !bytes.Equal(region, []byte("us-east-1")) {
 		t.Fatalf("Expected %v, received %v", "us-east-1", region)
 	}
 }
