@@ -1,6 +1,7 @@
 package appendOnly
 
 import (
+	"gitlab.com/stone.code/assert"
 	"os"
 	"syscall"
 )
@@ -65,6 +66,9 @@ func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 func (keyValueLog *KeyValueLog) Close() {
 	fileIO := NewFileIO()
 	fileIO.File = keyValueLog.file
+
+	fileIO.Munmap(keyValueLog.mappedBytes)
+	assert.Assert(fileIO.Err == nil, "Error must be nil in fileIO after unmap")
 	fileIO.CloseSilently()
 }
 
