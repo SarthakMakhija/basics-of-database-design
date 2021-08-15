@@ -8,8 +8,13 @@ Learn the basics of database design, to begin with a Key/Value store
 + Basics of block and page
 + Disk data structures
   + B+Trees
+      + Relevance of page
   + LSM Trees
+      + Relevance of page
+      + Understand probabilistic data structure (Bloom filter)
+      + Design a simple bloom filter
   + Concurrency with these data structures
+  + Understanding representation of each of these structures on disk
 + Write and read amplification
 + Transactions
 + Write ahead log
