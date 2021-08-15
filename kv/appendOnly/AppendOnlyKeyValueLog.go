@@ -1,6 +1,7 @@
 package appendOnly
 
 import (
+	"os"
 	"syscall"
 )
 
@@ -11,7 +12,7 @@ type Offset int64
 
 type KeyValueLog struct {
 	fileName              string
-	logFileDescriptor     uintptr
+	file                  *os.File
 	mappedBytes           []byte
 	currentStartingOffset Offset
 }
@@ -21,9 +22,9 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 	bytes := fileIO.Mmap(fileIO.File, 4096)
 	if fileIO.Err == nil {
 		return KeyValueLog{
-			fileName:          fileName,
-			logFileDescriptor: fileIO.File.Fd(),
-			mappedBytes:       bytes,
+			fileName:    fileName,
+			file:        fileIO.File,
+			mappedBytes: bytes,
 		}
 	}
 	return KeyValueLog{}
@@ -59,6 +60,10 @@ func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	fileIO.Open(keyValueLog.fileName, syscall.O_RDWR, 0600)
 	offset := fileIO.WriteAt(keyValueLog.currentStartingOffset, keyValuePair.Serialize())
 	return offset
+}
+
+func (keyValueLog *KeyValueLog) FileName() string {
+	return keyValueLog.fileName
 }
 
 func createOrOpen(fileName string) *MutableFileIO {
