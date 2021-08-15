@@ -38,7 +38,7 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 
 func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) int64 {
 	originalStartingOffset := keyValueLog.currentStartingOffset
-	newStartingOffset := keyValueLog.currentStartingOffset + int64(keyValueLog.add(keyValuePair))
+	newStartingOffset := originalStartingOffset + int64(keyValueLog.put(keyValuePair))
 	keyValueLog.currentStartingOffset = newStartingOffset
 
 	return originalStartingOffset
@@ -52,7 +52,7 @@ func (keyValueLog KeyValueLog) GetAtStartingOffset(offset int64) KeyValuePair {
 	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
 }
 
-func (keyValueLog *KeyValueLog) add(keyValuePair KeyValuePair) int {
+func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) int {
 	file, err := os.OpenFile(keyValueLog.fileName, syscall.O_RDWR, 0600)
 	defer syscall.Close(int(file.Fd()))
 
