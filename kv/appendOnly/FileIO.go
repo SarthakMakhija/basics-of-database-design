@@ -14,8 +14,8 @@ func NewFileIO() *MutableFileIO {
 	return &MutableFileIO{}
 }
 
-func (fileIO *MutableFileIO) Create(fileName string) {
-	file, err := os.Create(fileName)
+func (fileIO *MutableFileIO) CreateOrOpen(fileName string) {
+	file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, 0600)
 	if err != nil {
 		fileIO.Err = err
 		return

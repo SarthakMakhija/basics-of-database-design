@@ -11,7 +11,7 @@ func TestCreatesANewFile(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "./kv.test"
 
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	defer deleteFile(fileName)
 
 	if fileIO.File.Name() != fileName {
@@ -21,9 +21,9 @@ func TestCreatesANewFile(t *testing.T) {
 
 func TestCanNotCreatesANewFileGivenItIsADirectory(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
-	fileName := "/usr"
+	fileName := "/"
 
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	defer deleteFile(fileName)
 
 	if fileIO.Err == nil {
@@ -36,7 +36,7 @@ func TestOpensANewFile(t *testing.T) {
 	fileName := "./kv.test"
 
 	defer deleteFile(fileName)
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 
 	if fileIO.Err != nil {
@@ -62,7 +62,7 @@ func TestWritesAtAnOffsetInAFile(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
 	fileIO.WriteAt(0, content)
@@ -97,7 +97,7 @@ func TestMemoryMapsAFile(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
 	fileIO.WriteAt(0, content)

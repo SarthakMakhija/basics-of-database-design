@@ -17,7 +17,7 @@ type KeyValueLog struct {
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
-	fileIO := createFile(fileName)
+	fileIO := createOrOpen(fileName)
 	bytes := fileIO.Mmap(fileIO.File, 4096)
 	if fileIO.Err == nil {
 		return KeyValueLog{
@@ -53,8 +53,8 @@ func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
 	return offset
 }
 
-func createFile(fileName string) *MutableFileIO {
+func createOrOpen(fileName string) *MutableFileIO {
 	fileIO := NewFileIO()
-	fileIO.Create(fileName)
+	fileIO.CreateOrOpen(fileName)
 	return fileIO
 }
