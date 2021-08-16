@@ -72,6 +72,10 @@ func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileM
 	fileIO.File = file
 }
 
+func (fileIO *MutableFileIO) OpenReadOnly(fileName string) {
+	fileIO.Open(fileName, syscall.O_RDONLY, 0)
+}
+
 func (fileIO *MutableFileIO) FileSize(fileName string) int64 {
 	if fileIO.Err != nil {
 		return -1

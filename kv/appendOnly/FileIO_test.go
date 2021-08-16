@@ -185,3 +185,28 @@ func TestDoesNotReturnTheFileSizeOfDirectory(t *testing.T) {
 		t.Fatalf("Expected %v, received %v", -1, size)
 	}
 }
+
+func TestOpensANewFileForReading(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+	fileIO.CreateOrOpen(fileName)
+	fileIO.OpenReadOnly(fileName)
+
+	if fileIO.Err != nil {
+		t.Fatalf("Expected not error to be found while opening a file for reading but received %v", fileIO.Err)
+	}
+}
+
+func TestDoesNotOpenANonExistentNewFileForReading(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+	fileIO.OpenReadOnly(fileName)
+
+	if fileIO.Err == nil {
+		t.Fatalf("Expected error to be found while opening a non existent file for reading but received no error")
+	}
+}
