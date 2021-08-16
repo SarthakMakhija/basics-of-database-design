@@ -63,6 +63,8 @@ func TestPutGetSecondKeyPairToKeyValueLog(t *testing.T) {
 }
 
 func TestReturnsTrueGivenItIsANewlyCreatedKeyValueLog(t *testing.T) {
+	t.SkipNow()
+
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 

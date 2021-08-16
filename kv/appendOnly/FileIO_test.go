@@ -110,6 +110,21 @@ func TestMemoryMapsAFile(t *testing.T) {
 	}
 }
 
+func TestResizesAFileOnMemoryMap(t *testing.T) {
+	fileIO := appendOnly.NewFileIO()
+	fileName := "./kv.test"
+
+	defer deleteFile(fileName)
+
+	fileIO.CreateOrOpen(fileName)
+	fileIO.Mmap(fileIO.File, 5)
+	size := fileIO.FileSize(fileName)
+
+	if size != 5 {
+		t.Fatalf("Expected resized file to be of size %v, received %v", 5, size)
+	}
+}
+
 func TestDoesNotMemoryMapANonExistentFile(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "./kv.test"

@@ -27,12 +27,24 @@ func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
 	if fileIO.Err != nil {
 		return nil
 	}
-	bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil {
-		fileIO.Err = err
-		return nil
+	resizeZeroSizedFile := func() {
+		if fileIO.FileSize(file.Name()) == 0 {
+			err := os.Truncate(file.Name(), int64(fileSizeInBytes))
+			if err != nil {
+				fileIO.Err = err
+			}
+		}
 	}
-	return bytes
+	mmap := func() []byte {
+		bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ, syscall.MAP_SHARED)
+		if err != nil {
+			fileIO.Err = err
+			return nil
+		}
+		return bytes
+	}
+	resizeZeroSizedFile()
+	return mmap()
 }
 
 func (fileIO *MutableFileIO) Munmap(bytes []byte) {
