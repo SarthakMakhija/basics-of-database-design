@@ -29,3 +29,7 @@ Learn the basics of database design, to begin with a Key/Value store
 + Current implementation has NO concept of page, transaction, concurrency, endianness, block or sector alignment, fsync, fadvice
 + Current implementation (re)loads the entire append only key/value log, if the key/value store gets restarted
 + Size of memory mapped file is hardcoded 4096 bytes
+
+# 16th August 2021
++ Current implementation acquires lock on the database key/value log file in an exclusive mode
++ Current implementation releases the lock on the database file on store close
