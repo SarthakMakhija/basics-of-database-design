@@ -17,6 +17,7 @@ func TestAcquiresFileLock(t *testing.T) {
 
 	fileLock := appendOnly.AcquireExclusiveLock(fileName)
 	defer release(fileLock)
+	defer deleteFile(fileName)
 
 	if fileLock.Err != nil {
 		t.Fatalf("Expected lock to be acquired on the file but received an error %v", fileLock.Err)
@@ -33,6 +34,7 @@ func TestOneCallAcquiresAnExclusiveLockAndOtherFails(t *testing.T) {
 	fileLock2 := appendOnly.AcquireExclusiveLock(fileName)
 
 	defer release(fileLock1)
+	defer deleteFile(fileName)
 
 	if fileLock1.Err != nil {
 		t.Fatalf("Expected lock to be acquired by the first process but received an error %v", fileLock1.Err)
@@ -50,6 +52,7 @@ func TestReleasesALockOnTheFile(t *testing.T) {
 
 	fileLock := appendOnly.AcquireExclusiveLock(fileName)
 	err := fileLock.Release()
+	defer deleteFile(fileName)
 
 	if err != nil {
 		t.Fatalf("Expected lock to be released successfully but received an error %v", err)
