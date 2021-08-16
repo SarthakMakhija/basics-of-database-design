@@ -33,3 +33,5 @@ Learn the basics of database design, to begin with a Key/Value store
 # 16th August 2021
 + Current implementation acquires a lock in an exclusive mode on the key/value log file
 + Current implementation releases the lock on the database file on store close
++ Current implementation uses key/value log iterator to iterate over an existing log to get the next writable offset
++ Current implementation removes the need for *writeAt* when dealing with memory mapped key/value log file
