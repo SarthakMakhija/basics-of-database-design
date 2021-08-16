@@ -31,5 +31,5 @@ Learn the basics of database design, to begin with a Key/Value store
 + Size of memory mapped file is hardcoded 4096 bytes
 
 # 16th August 2021
-+ Current implementation acquires lock on the database key/value log file in an exclusive mode
++ Current implementation acquires a lock in an exclusive mode on the key/value log file
 + Current implementation releases the lock on the database file on store close
