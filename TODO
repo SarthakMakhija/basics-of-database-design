@@ -4,3 +4,6 @@
 - Handle hardcoded memory mapped file size
 - How to avoid using write system call to write to a memory mapped file
 - Store test for file lock
+- Ensure that entries written to the key/value log file are actually persisted on the physical media (fsync)
+- See if we need fadvice
+- CRC in log entries
