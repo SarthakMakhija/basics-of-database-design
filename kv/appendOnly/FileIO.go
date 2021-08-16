@@ -15,7 +15,18 @@ func NewFileIO() *MutableFileIO {
 }
 
 func (fileIO *MutableFileIO) CreateOrOpenReadWrite(fileName string) {
-	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0600)
+	fileIO.Open(fileName, os.O_RDWR|os.O_CREATE, 0600)
+}
+
+func (fileIO *MutableFileIO) OpenReadOnly(fileName string) {
+	fileIO.Open(fileName, syscall.O_RDONLY, 0)
+}
+
+func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileMode) {
+	if fileIO.Err != nil {
+		return
+	}
+	file, err := os.OpenFile(fileName, flag, permission)
 	if err != nil {
 		fileIO.Err = err
 		return
@@ -55,22 +66,6 @@ func (fileIO *MutableFileIO) Munmap(bytes []byte) {
 	if err != nil {
 		fileIO.Err = err
 	}
-}
-
-func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileMode) {
-	if fileIO.Err != nil {
-		return
-	}
-	file, err := os.OpenFile(fileName, flag, permission)
-	if err != nil {
-		fileIO.Err = err
-		return
-	}
-	fileIO.File = file
-}
-
-func (fileIO *MutableFileIO) OpenReadOnly(fileName string) {
-	fileIO.Open(fileName, syscall.O_RDONLY, 0)
 }
 
 func (fileIO *MutableFileIO) FileSize(fileName string) int64 {
