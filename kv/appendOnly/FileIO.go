@@ -57,21 +57,6 @@ func (fileIO *MutableFileIO) Munmap(bytes []byte) {
 	}
 }
 
-func (fileIO *MutableFileIO) WriteAt(offset Offset, bytes []byte) Offset {
-	if fileIO.Err != nil {
-		return -1
-	}
-
-	defer fileIO.CloseSilently()
-
-	bytesWritten, err := fileIO.File.WriteAt(bytes, int64(offset))
-	if err != nil {
-		fileIO.Err = err
-		return -1
-	}
-	return Offset(int64(bytesWritten))
-}
-
 func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileMode) {
 	if fileIO.Err != nil {
 		return

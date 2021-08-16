@@ -56,41 +56,6 @@ func TestDoesNotOpenANonExistentNewFile(t *testing.T) {
 	}
 }
 
-func TestWritesAtAnOffsetInAFile(t *testing.T) {
-	fileIO := appendOnly.NewFileIO()
-	fileName := "./kv.test"
-
-	defer deleteFile(fileName)
-
-	fileIO.CreateOrOpenReadWrite(fileName)
-	fileIO.Open(fileName, os.O_RDWR, 0600)
-	content := []byte{'h', 'e', 'l', 'l', 'o'}
-	fileIO.WriteAt(0, content)
-
-	bytesRead := make([]byte, 5)
-	fileIO.Open(fileName, os.O_RDWR, 0600)
-	_, _ = fileIO.File.Read(bytesRead)
-
-	if !bytes.Equal(content, bytesRead) {
-		t.Fatalf("Expected %v, received %v", content, bytesRead)
-	}
-}
-
-func TestDoesNotWriteToANonExistentFile(t *testing.T) {
-	fileIO := appendOnly.NewFileIO()
-	fileName := "./kv.test"
-
-	defer deleteFile(fileName)
-
-	fileIO.Open(fileName, os.O_RDWR, 0600)
-	content := []byte{'h', 'e', 'l', 'l', 'o'}
-	offset := fileIO.WriteAt(0, content)
-
-	if offset != -1 {
-		t.Fatalf("Expected %v, received %v", -1, offset)
-	}
-}
-
 func TestMemoryMapsAFile(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "./kv.test"
@@ -100,7 +65,7 @@ func TestMemoryMapsAFile(t *testing.T) {
 	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
-	fileIO.WriteAt(0, content)
+	_, _ = fileIO.File.WriteAt(content, 0)
 
 	fileIO.Open(fileName, os.O_RDWR, 0400)
 	mappedBytes := fileIO.Mmap(fileIO.File, 5)
@@ -148,7 +113,7 @@ func TestUnMapsAFile(t *testing.T) {
 	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
-	fileIO.WriteAt(0, content)
+	_, _ = fileIO.File.WriteAt(content, 0)
 
 	fileIO.Open(fileName, os.O_RDWR, 0400)
 	mappedBytes := fileIO.Mmap(fileIO.File, 5)
