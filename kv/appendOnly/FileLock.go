@@ -29,7 +29,21 @@ func AcquireExclusiveLock(fileName string) FileLock {
 
 func (fileLock FileLock) Release() error {
 	if fileLock.LockedFile != nil {
-		return syscall.Flock(int(fileLock.LockedFile.Fd()), syscall.LOCK_UN)
+		err := fileLock.unlock()
+		if err != nil {
+			return err
+		}
+		fileLock.close()
 	}
 	return nil
+}
+
+func (fileLock FileLock) unlock() error {
+	return syscall.Flock(int(fileLock.LockedFile.Fd()), syscall.LOCK_UN)
+}
+
+func (fileLock FileLock) close() {
+	fileIO := NewFileIO()
+	fileIO.File = fileLock.LockedFile
+	fileIO.CloseSilently()
 }
