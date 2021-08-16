@@ -3,7 +3,6 @@ package appendOnly
 import (
 	"gitlab.com/stone.code/assert"
 	"os"
-	"syscall"
 )
 
 type Offset int64
@@ -16,7 +15,7 @@ type KeyValueLog struct {
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
-	fileIO := createOrOpen(fileName)
+	fileIO := CreateOrOpenReadWrite(fileName)
 	bytes := fileIO.Mmap(fileIO.File, 4096)
 	if fileIO.Err == nil {
 		return KeyValueLog{
@@ -30,7 +29,7 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 
 func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) Offset {
 	originalStartingOffset := keyValueLog.currentStartingOffset
-	newStartingOffset := originalStartingOffset + keyValueLog.put(keyValuePair)
+	newStartingOffset := originalStartingOffset + Offset(keyValueLog.put(keyValuePair))
 	keyValueLog.currentStartingOffset = newStartingOffset
 
 	return originalStartingOffset
@@ -57,16 +56,13 @@ func (keyValueLog *KeyValueLog) Close() {
 	fileIO.CloseSilently()
 }
 
-func createOrOpen(fileName string) *MutableFileIO {
+func CreateOrOpenReadWrite(fileName string) *MutableFileIO {
 	fileIO := NewFileIO()
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	return fileIO
 }
 
-func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) Offset {
-	fileIO := NewFileIO()
-
-	fileIO.Open(keyValueLog.fileName, syscall.O_RDWR, 0600)
-	offset := fileIO.WriteAt(keyValueLog.currentStartingOffset, keyValuePair.Serialize())
-	return offset
+func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) int {
+	bytes4 := keyValuePair.Serialize()
+	return copy(keyValueLog.mappedBytes[keyValueLog.currentStartingOffset:], bytes4)
 }

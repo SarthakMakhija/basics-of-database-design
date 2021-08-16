@@ -13,7 +13,7 @@ func TestAcquiresFileLock(t *testing.T) {
 	fileName := "./kv.test"
 
 	fileIO := appendOnly.NewFileIO()
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 
 	fileLock := appendOnly.AcquireExclusiveLock(fileName)
 	defer release(fileLock)
@@ -28,7 +28,7 @@ func TestOneCallAcquiresAnExclusiveLockAndOtherFails(t *testing.T) {
 	fileName := "./kv.test"
 
 	fileIO := appendOnly.NewFileIO()
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 
 	fileLock1 := appendOnly.AcquireExclusiveLock(fileName)
 	fileLock2 := appendOnly.AcquireExclusiveLock(fileName)
@@ -48,7 +48,7 @@ func TestReleasesALockOnTheFile(t *testing.T) {
 	fileName := "./kv.test"
 
 	fileIO := appendOnly.NewFileIO()
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 
 	fileLock := appendOnly.AcquireExclusiveLock(fileName)
 	err := fileLock.Release()

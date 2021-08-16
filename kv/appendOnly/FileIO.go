@@ -14,8 +14,8 @@ func NewFileIO() *MutableFileIO {
 	return &MutableFileIO{}
 }
 
-func (fileIO *MutableFileIO) CreateOrOpen(fileName string) {
-	file, err := os.OpenFile(fileName, os.O_RDONLY|os.O_CREATE, 0600)
+func (fileIO *MutableFileIO) CreateOrOpenReadWrite(fileName string) {
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		fileIO.Err = err
 		return
@@ -36,7 +36,7 @@ func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
 		}
 	}
 	mmap := func() []byte {
-		bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ, syscall.MAP_SHARED)
+		bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 		if err != nil {
 			fileIO.Err = err
 			return nil

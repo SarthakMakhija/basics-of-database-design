@@ -11,7 +11,7 @@ func TestCreatesANewFile(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "./kv.test"
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	defer deleteFile(fileName)
 
 	if fileIO.File.Name() != fileName {
@@ -23,7 +23,7 @@ func TestCanNotCreatesANewFileGivenItIsADirectory(t *testing.T) {
 	fileIO := appendOnly.NewFileIO()
 	fileName := "/"
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	defer deleteFile(fileName)
 
 	if fileIO.Err == nil {
@@ -36,7 +36,7 @@ func TestOpensANewFile(t *testing.T) {
 	fileName := "./kv.test"
 
 	defer deleteFile(fileName)
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 
 	if fileIO.Err != nil {
@@ -62,7 +62,7 @@ func TestWritesAtAnOffsetInAFile(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
 	fileIO.WriteAt(0, content)
@@ -97,12 +97,12 @@ func TestMemoryMapsAFile(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
 	fileIO.WriteAt(0, content)
 
-	fileIO.Open(fileName, os.O_RDONLY, 0400)
+	fileIO.Open(fileName, os.O_RDWR, 0400)
 	mappedBytes := fileIO.Mmap(fileIO.File, 5)
 
 	if !bytes.Equal(content, mappedBytes) {
@@ -116,7 +116,7 @@ func TestResizesAFileOnMemoryMap(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Mmap(fileIO.File, 5)
 	size := fileIO.FileSize(fileName)
 
@@ -145,12 +145,12 @@ func TestUnMapsAFile(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.Open(fileName, os.O_RDWR, 0600)
 	content := []byte{'h', 'e', 'l', 'l', 'o'}
 	fileIO.WriteAt(0, content)
 
-	fileIO.Open(fileName, os.O_RDONLY, 0400)
+	fileIO.Open(fileName, os.O_RDWR, 0400)
 	mappedBytes := fileIO.Mmap(fileIO.File, 5)
 	fileIO.Munmap(mappedBytes)
 
@@ -179,7 +179,7 @@ func TestReturnsTheFileSize(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	size := fileIO.FileSize(fileName)
 
 	if size != 0 {
@@ -193,7 +193,7 @@ func TestDoesNotReturnTheFileSizeOfDirectory(t *testing.T) {
 
 	defer deleteFile(fileName)
 
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	size := fileIO.FileSize(fileName)
 
 	if size != -1 {
@@ -206,7 +206,7 @@ func TestOpensANewFileForReading(t *testing.T) {
 	fileName := "./kv.test"
 
 	defer deleteFile(fileName)
-	fileIO.CreateOrOpen(fileName)
+	fileIO.CreateOrOpenReadWrite(fileName)
 	fileIO.OpenReadOnly(fileName)
 
 	if fileIO.Err != nil {
