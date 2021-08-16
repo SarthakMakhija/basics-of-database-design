@@ -6,9 +6,6 @@ import (
 	"syscall"
 )
 
-//TODO: Handle error gracefully
-//TODO: Handle fileSize 4096
-
 type Offset int64
 
 type KeyValueLog struct {

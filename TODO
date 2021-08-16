@@ -1,0 +1,6 @@
+- Check the byte array size in KeyValuePair
+- Error handling
+- Ensure all file descriptors are closed
+- Handle hardcoded memory mapped file size
+- How to avoid using write system call to write to a memory mapped file
+- Store test for file lock
