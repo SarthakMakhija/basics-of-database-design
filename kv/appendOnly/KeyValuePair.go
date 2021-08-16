@@ -17,6 +17,10 @@ type keyValueLogContent struct {
 	value     []byte
 }
 
+func (keyValueLogContent keyValueLogContent) isEmpty() bool {
+	return keyValueLogContent.keySize == 0
+}
+
 const KeyValueContentSize = unsafe.Sizeof(keyValueLogContent{})
 
 func (keyValuePair KeyValuePair) Serialize() []byte {
@@ -37,6 +41,9 @@ func DeserializeFrom(bytes []byte) KeyValuePair {
 
 func DeserializeFromOffset(bytes []byte, offset Offset) KeyValuePair {
 	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[offset]))
+	if keyValueLogContent.isEmpty() {
+		return KeyValuePair{}
+	}
 	return KeyValuePair{
 		Key:            keyValueLogContent.key,
 		Value:          keyValueLogContent.value,
@@ -49,7 +56,11 @@ func DeserializeAll(bytes []byte) []KeyValuePair {
 
 	var offset Offset = 0
 	for offset < Offset(int64(len(bytes))) {
-		pairs = append(pairs, DeserializeFromOffset(bytes, offset))
+		keyValuePair := DeserializeFromOffset(bytes, offset)
+		if keyValuePair.isEmpty() {
+			break
+		}
+		pairs = append(pairs, keyValuePair)
 		offset = offset + Offset(int64(KeyValueContentSize))
 	}
 	return pairs
@@ -61,4 +72,8 @@ func (keyValuePair KeyValuePair) keySize() int {
 
 func (keyValuePair KeyValuePair) valueSize() int {
 	return len(keyValuePair.Value)
+}
+
+func (keyValuePair KeyValuePair) isEmpty() bool {
+	return keyValuePair.keySize() == 0
 }

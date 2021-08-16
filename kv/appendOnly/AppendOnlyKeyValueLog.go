@@ -15,14 +15,31 @@ type KeyValueLog struct {
 }
 
 func NewKeyValueLog(fileName string) KeyValueLog {
+
+	nextStartingOffset := func(bytes []byte) Offset {
+		var offset Offset = 0
+		for offset < Offset(int64(len(bytes))) {
+			keyValuePair := DeserializeFromOffset(bytes, offset)
+			if keyValuePair.isEmpty() {
+				break
+			}
+			offset = offset + Offset(int64(KeyValueContentSize))
+		}
+		return offset
+	}
+
 	fileIO := CreateOrOpenReadWrite(fileName)
-	bytes := fileIO.Mmap(fileIO.File, 4096)
+	bytes, isNew := fileIO.Mmap(fileIO.File, 4096)
 	if fileIO.Err == nil {
-		return KeyValueLog{
+		log := KeyValueLog{
 			fileName:    fileName,
 			file:        fileIO.File,
 			mappedBytes: bytes,
 		}
+		if !isNew {
+			log.currentStartingOffset = nextStartingOffset(bytes)
+		}
+		return log
 	}
 	return KeyValueLog{}
 }

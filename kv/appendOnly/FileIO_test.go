@@ -68,7 +68,7 @@ func TestMemoryMapsAFile(t *testing.T) {
 	_, _ = fileIO.File.WriteAt(content, 0)
 
 	fileIO.Open(fileName, os.O_RDWR, 0400)
-	mappedBytes := fileIO.Mmap(fileIO.File, 5)
+	mappedBytes, _ := fileIO.Mmap(fileIO.File, 5)
 
 	if !bytes.Equal(content, mappedBytes) {
 		t.Fatalf("Expected %v, received %v", content, mappedBytes)
@@ -97,7 +97,7 @@ func TestDoesNotMemoryMapANonExistentFile(t *testing.T) {
 	defer deleteFile(fileName)
 
 	fileIO.Open(fileName, os.O_RDWR, 0600)
-	mappedBytes := fileIO.Mmap(fileIO.File, 5)
+	mappedBytes, _ := fileIO.Mmap(fileIO.File, 5)
 
 	if mappedBytes != nil {
 		t.Fatalf("Expected %v, received %v", nil, mappedBytes)
@@ -116,7 +116,7 @@ func TestUnMapsAFile(t *testing.T) {
 	_, _ = fileIO.File.WriteAt(content, 0)
 
 	fileIO.Open(fileName, os.O_RDWR, 0400)
-	mappedBytes := fileIO.Mmap(fileIO.File, 5)
+	mappedBytes, _ := fileIO.Mmap(fileIO.File, 5)
 	fileIO.Munmap(mappedBytes)
 
 	if fileIO.Err != nil {

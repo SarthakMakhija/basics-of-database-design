@@ -74,7 +74,7 @@ func TestPutMultipleKeyValuesInStoreGivenInMemoryTableGetsReloaded(t *testing.T)
 	}
 }
 
-func TestPutMultipleKeyValuesInStoreGivenInMemoryTableGetsReloadedAfterClose(t *testing.T) {
+func TestGetKeyInStoreGivenInMemoryTableGetsReloadedAfterClose(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
@@ -89,6 +89,33 @@ func TestPutMultipleKeyValuesInStoreGivenInMemoryTableGetsReloadedAfterClose(t *
 	value := reOpenedStore.Get([]byte("StoreType"))
 
 	expectedValue := []byte("KeyValue")
+
+	if !bytes.Equal(value, expectedValue) {
+		t.Fatalf("Expected %v, received %v", expectedValue, value)
+	}
+}
+
+func TestPutAKeyValueInStoreGivenInMemoryTableGetsReloadedAfterClose(t *testing.T) {
+	fileName := "./keyValue.kvlog"
+	defer deleteFile(fileName)
+
+	store := appendOnly.Open(fileName)
+
+	store.Put([]byte("Company"), []byte("ThoughtWorks"))
+	store.Close()
+
+	reOpenedStore := appendOnly.Open(fileName)
+	reOpenedStore.Put([]byte("BranchLocation"), []byte("India"))
+
+	value := reOpenedStore.Get([]byte("BranchLocation"))
+	expectedValue := []byte("India")
+
+	if !bytes.Equal(value, expectedValue) {
+		t.Fatalf("Expected %v, received %v", expectedValue, value)
+	}
+
+	value = reOpenedStore.Get([]byte("Company"))
+	expectedValue = []byte("ThoughtWorks")
 
 	if !bytes.Equal(value, expectedValue) {
 		t.Fatalf("Expected %v, received %v", expectedValue, value)

@@ -34,17 +34,19 @@ func (fileIO *MutableFileIO) Open(fileName string, flag int, permission os.FileM
 	fileIO.File = file
 }
 
-func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
+func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) ([]byte, bool) {
 	if fileIO.Err != nil {
-		return nil
+		return nil, false
 	}
-	resizeZeroSizedFile := func() {
+	resizeZeroSizedFile := func() bool {
 		if fileIO.FileSize(file.Name()) == 0 {
 			err := os.Truncate(file.Name(), int64(fileSizeInBytes))
 			if err != nil {
 				fileIO.Err = err
 			}
+			return true
 		}
+		return false
 	}
 	mmap := func() []byte {
 		bytes, err := syscall.Mmap(int(file.Fd()), 0, fileSizeInBytes, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
@@ -54,8 +56,8 @@ func (fileIO *MutableFileIO) Mmap(file *os.File, fileSizeInBytes int) []byte {
 		}
 		return bytes
 	}
-	resizeZeroSizedFile()
-	return mmap()
+	isNew := resizeZeroSizedFile()
+	return mmap(), isNew
 }
 
 func (fileIO *MutableFileIO) Munmap(bytes []byte) {
