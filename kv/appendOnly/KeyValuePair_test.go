@@ -11,7 +11,8 @@ func TestSerializeKey(t *testing.T) {
 		Key: []byte("Sector"),
 	}
 	serialized := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(serialized)
+	iterator := appendOnly.NewKeyValuePairIterator(serialized)
+	deserializedPair := iterator.Next()
 
 	if !bytes.Equal(deserializedPair.Key, pair.Key) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
@@ -23,7 +24,8 @@ func TestSerializeValue(t *testing.T) {
 		Value: []byte("512B"),
 	}
 	serialized := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(serialized)
+	iterator := appendOnly.NewKeyValuePairIterator(serialized)
+	deserializedPair := iterator.Next()
 
 	if !bytes.Equal(deserializedPair.Value, pair.Value) {
 		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
@@ -36,7 +38,8 @@ func TestSerializeKeyValue(t *testing.T) {
 		Value: []byte("512B"),
 	}
 	serialized := pair.Serialize()
-	deserializedPair := appendOnly.DeserializeFrom(serialized)
+	iterator := appendOnly.NewKeyValuePairIterator(serialized)
+	deserializedPair := iterator.Next()
 
 	if !bytes.Equal(deserializedPair.Key, pair.Key) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
@@ -71,7 +74,8 @@ func TestSerializeDeserializeAll(t *testing.T) {
 	finalByteArray = append(finalByteArray, secondByteArray...)
 	finalByteArray = append(finalByteArray, thirdByteArray...)
 
-	allPairs := appendOnly.DeserializeAll(finalByteArray)
+	iterator := appendOnly.NewKeyValuePairIterator(finalByteArray)
+	allPairs := iterator.All()
 
 	if !bytes.Equal(allPairs[0].Key, firstPair.Key) {
 		t.Fatalf("Expected Key %v, received %v", firstPair.Key, allPairs[0].Key)
@@ -93,5 +97,4 @@ func TestSerializeDeserializeAll(t *testing.T) {
 	if !bytes.Equal(allPairs[2].Value, thirdPair.Value) {
 		t.Fatalf("Expected Key %v, received %v", thirdPair.Value, allPairs[2].Value)
 	}
-
 }

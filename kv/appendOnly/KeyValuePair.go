@@ -35,37 +35,6 @@ func (keyValuePair KeyValuePair) Serialize() []byte {
 	return bytes
 }
 
-func DeserializeFrom(bytes []byte) KeyValuePair {
-	return DeserializeFromOffset(bytes, 0)
-}
-
-func DeserializeFromOffset(bytes []byte, offset Offset) KeyValuePair {
-	keyValueLogContent := (*keyValueLogContent)(unsafe.Pointer(&bytes[offset]))
-	if keyValueLogContent.isEmpty() {
-		return KeyValuePair{}
-	}
-	return KeyValuePair{
-		Key:            keyValueLogContent.key,
-		Value:          keyValueLogContent.value,
-		startingOffset: offset,
-	}
-}
-
-func DeserializeAll(bytes []byte) []KeyValuePair {
-	var pairs []KeyValuePair
-
-	var offset Offset = 0
-	for offset < Offset(int64(len(bytes))) {
-		keyValuePair := DeserializeFromOffset(bytes, offset)
-		if keyValuePair.isEmpty() {
-			break
-		}
-		pairs = append(pairs, keyValuePair)
-		offset = offset + Offset(int64(KeyValueContentSize))
-	}
-	return pairs
-}
-
 func (keyValuePair KeyValuePair) keySize() int {
 	return len(keyValuePair.Key)
 }
@@ -76,4 +45,57 @@ func (keyValuePair KeyValuePair) valueSize() int {
 
 func (keyValuePair KeyValuePair) isEmpty() bool {
 	return keyValuePair.keySize() == 0
+}
+
+type KeyValuePairIterator struct {
+	bytes         []byte
+	currentOffset Offset
+}
+
+func NewKeyValuePairIterator(bytes []byte) *KeyValuePairIterator {
+	return NewKeyValuePairIteratorAt(0, bytes)
+}
+
+func NewKeyValuePairIteratorAt(offset Offset, bytes []byte) *KeyValuePairIterator {
+	return &KeyValuePairIterator{
+		bytes:         bytes,
+		currentOffset: offset,
+	}
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) HasNext() bool {
+	if keyValuePairIterator.keyValueLogContent().isEmpty() {
+		return false
+	}
+	return true
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) Next() KeyValuePair {
+	keyValueLogContent := keyValuePairIterator.keyValueLogContent()
+	pair := KeyValuePair{
+		Key:            keyValueLogContent.key,
+		Value:          keyValueLogContent.value,
+		startingOffset: keyValuePairIterator.currentOffset,
+	}
+	keyValuePairIterator.currentOffset = keyValuePairIterator.currentOffset + Offset(int64(KeyValueContentSize))
+	return pair
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) All() []KeyValuePair {
+	var pairs []KeyValuePair
+	for int(keyValuePairIterator.currentOffset) < len(keyValuePairIterator.bytes) && keyValuePairIterator.HasNext() {
+		pairs = append(pairs, keyValuePairIterator.Next())
+	}
+	return pairs
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) NextStartingOffset() Offset {
+	for int(keyValuePairIterator.currentOffset) < len(keyValuePairIterator.bytes) && keyValuePairIterator.HasNext() {
+		keyValuePairIterator.Next()
+	}
+	return keyValuePairIterator.currentOffset
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) keyValueLogContent() *keyValueLogContent {
+	return (*keyValueLogContent)(unsafe.Pointer(&keyValuePairIterator.bytes[keyValuePairIterator.currentOffset]))
 }

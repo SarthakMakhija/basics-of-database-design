@@ -14,7 +14,7 @@ func NewInMemoryKeyValueOffsetTable(keyValueLog *KeyValueLog) InMemoryKeyValueOf
 
 func ReloadFrom(keyValueLog *KeyValueLog) InMemoryKeyValueOffsetTable {
 	inMemoryKeyValueOffsetTable := NewInMemoryKeyValueOffsetTable(keyValueLog)
-	keyValuePairs := DeserializeAll(keyValueLog.mappedBytes)
+	keyValuePairs := NewKeyValuePairIterator(keyValueLog.mappedBytes).All()
 
 	for _, pair := range keyValuePairs {
 		inMemoryKeyValueOffsetTable.offsetByKey[string(pair.Key)] = pair.startingOffset

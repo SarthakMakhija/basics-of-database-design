@@ -17,15 +17,7 @@ type KeyValueLog struct {
 func NewKeyValueLog(fileName string) KeyValueLog {
 
 	nextStartingOffset := func(bytes []byte) Offset {
-		var offset Offset = 0
-		for offset < Offset(int64(len(bytes))) {
-			keyValuePair := DeserializeFromOffset(bytes, offset)
-			if keyValuePair.isEmpty() {
-				break
-			}
-			offset = offset + Offset(int64(KeyValueContentSize))
-		}
-		return offset
+		return NewKeyValuePairIterator(bytes).NextStartingOffset()
 	}
 
 	fileIO := CreateOrOpenReadWrite(fileName)
@@ -53,7 +45,7 @@ func (keyValueLog *KeyValueLog) Put(keyValuePair KeyValuePair) Offset {
 }
 
 func (keyValueLog KeyValueLog) GetAtStartingOffset(offset Offset) KeyValuePair {
-	return DeserializeFromOffset(keyValueLog.mappedBytes, offset)
+	return NewKeyValuePairIteratorAt(offset, keyValueLog.mappedBytes).Next()
 }
 
 func (keyValueLog KeyValueLog) IsANewlyCreatedKeyValueLog() bool {
