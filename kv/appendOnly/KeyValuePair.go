@@ -52,6 +52,8 @@ type KeyValuePairIterator struct {
 	currentOffset Offset
 }
 
+type iterationFunction func(keyValuePair KeyValuePair)
+
 func NewKeyValuePairIterator(bytes []byte) *KeyValuePairIterator {
 	return NewKeyValuePairIteratorAt(0, bytes)
 }
@@ -64,10 +66,13 @@ func NewKeyValuePairIteratorAt(offset Offset, bytes []byte) *KeyValuePairIterato
 }
 
 func (keyValuePairIterator *KeyValuePairIterator) HasNext() bool {
-	if keyValuePairIterator.keyValueLogContent().isEmpty() {
-		return false
+	if keyValuePairIterator.offsetLessThanContentSize() {
+		if keyValuePairIterator.keyValueLogContent().isEmpty() {
+			return false
+		}
+		return true
 	}
-	return true
+	return false
 }
 
 func (keyValuePairIterator *KeyValuePairIterator) Next() KeyValuePair {
@@ -83,19 +88,27 @@ func (keyValuePairIterator *KeyValuePairIterator) Next() KeyValuePair {
 
 func (keyValuePairIterator *KeyValuePairIterator) All() []KeyValuePair {
 	var pairs []KeyValuePair
-	for int(keyValuePairIterator.currentOffset) < len(keyValuePairIterator.bytes) && keyValuePairIterator.HasNext() {
-		pairs = append(pairs, keyValuePairIterator.Next())
-	}
+	keyValuePairIterator.iterateWith(func(keyValuePair KeyValuePair) {
+		pairs = append(pairs, keyValuePair)
+	})
 	return pairs
 }
 
 func (keyValuePairIterator *KeyValuePairIterator) NextStartingOffset() Offset {
-	for int(keyValuePairIterator.currentOffset) < len(keyValuePairIterator.bytes) && keyValuePairIterator.HasNext() {
-		keyValuePairIterator.Next()
-	}
+	keyValuePairIterator.iterateWith(func(keyValuePair KeyValuePair) {})
 	return keyValuePairIterator.currentOffset
 }
 
 func (keyValuePairIterator *KeyValuePairIterator) keyValueLogContent() *keyValueLogContent {
 	return (*keyValueLogContent)(unsafe.Pointer(&keyValuePairIterator.bytes[keyValuePairIterator.currentOffset]))
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) offsetLessThanContentSize() bool {
+	return int(keyValuePairIterator.currentOffset) < len(keyValuePairIterator.bytes)
+}
+
+func (keyValuePairIterator *KeyValuePairIterator) iterateWith(fn iterationFunction) {
+	for keyValuePairIterator.offsetLessThanContentSize() && keyValuePairIterator.HasNext() {
+		fn(keyValuePairIterator.Next())
+	}
 }
