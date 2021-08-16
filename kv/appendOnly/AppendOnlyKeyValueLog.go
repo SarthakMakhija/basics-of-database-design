@@ -63,6 +63,6 @@ func CreateOrOpenReadWrite(fileName string) *MutableFileIO {
 }
 
 func (keyValueLog *KeyValueLog) put(keyValuePair KeyValuePair) int {
-	bytes4 := keyValuePair.Serialize()
-	return copy(keyValueLog.mappedBytes[keyValueLog.currentStartingOffset:], bytes4)
+	bytes := keyValuePair.Serialize()
+	return copy(keyValueLog.mappedBytes[keyValueLog.currentStartingOffset:], bytes)
 }
