@@ -82,7 +82,7 @@ func (keyValuePairIterator *KeyValuePairIterator) Next() KeyValuePair {
 		Value:          keyValueLogContent.value,
 		startingOffset: keyValuePairIterator.currentOffset,
 	}
-	keyValuePairIterator.currentOffset = keyValuePairIterator.currentOffset + Offset(int64(KeyValueContentSize))
+	keyValuePairIterator.currentOffset = keyValuePairIterator.currentOffset + Offset(uint64(KeyValueContentSize))
 	return pair
 }
 

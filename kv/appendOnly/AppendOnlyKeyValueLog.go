@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type Offset int64
+type Offset uint64
 
 type KeyValueLog struct {
 	fileName              string
