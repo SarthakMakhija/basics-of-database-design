@@ -2,8 +2,10 @@
 - Error handling
 - Ensure all file descriptors are closed
 - Handle hardcoded memory mapped file size
-- How to avoid using write system call to write to a memory mapped file
+- How to avoid using write system call to write to a memory mapped file (done)
 - Store test for file lock
 - Ensure that entries written to the key/value log file are actually persisted on the physical media (fsync)
 - See if we need fadvice
 - CRC in log entries
+- Probably missing abstractions like SerializedKeyValue, MemoryMappedFile
+- KeyValuePair should provide behavior to return key/value as strings
