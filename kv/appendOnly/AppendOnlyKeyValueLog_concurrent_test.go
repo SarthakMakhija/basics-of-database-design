@@ -85,10 +85,7 @@ func (execution *concurrentExecution) runPutWithIndexedKeyValue(numberOfGoroutin
 func (execution *concurrentExecution) loggedKeyValuePairs() []appendOnly.KeyValuePair {
 	var pairs []appendOnly.KeyValuePair
 	for _, offset := range execution.offsetResult.offsets {
-		pairs = append(pairs, appendOnly.KeyValuePair{
-			Key:   execution.log.GetAtStartingOffset(offset).Key,
-			Value: execution.log.GetAtStartingOffset(offset).Value,
-		})
+		pairs = append(pairs, execution.log.GetAtStartingOffset(offset))
 	}
 	return pairs
 }
