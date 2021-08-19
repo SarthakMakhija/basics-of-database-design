@@ -13,10 +13,16 @@ func TestConcurrentPutInKeyValueLog(t *testing.T) {
 	fileName := "./keyValue.kvlog"
 	defer deleteFile(fileName)
 
+	log := appendOnly.NewKeyValueLog(fileName)
 	execution := concurrentExecution{
-		log:         appendOnly.NewKeyValueLog(fileName),
 		keyPrefix:   "Key",
 		valuePrefix: "Value",
+		putFunction: func(pair appendOnly.KeyValuePair) appendOnly.Offset {
+			return log.Put(pair)
+		},
+		getFunction: func(offset appendOnly.Offset) appendOnly.KeyValuePair {
+			return log.GetAtStartingOffset(offset)
+		},
 	}
 
 	numberOfGoroutines := 30
@@ -52,9 +58,10 @@ type concurrentExecution struct {
 	offsetResult        offsetResult
 	sourceKeyValuePairs []appendOnly.KeyValuePair
 	wg                  sync.WaitGroup
-	log                 appendOnly.KeyValueLog
 	keyPrefix           string
 	valuePrefix         string
+	putFunction         func(pair appendOnly.KeyValuePair) appendOnly.Offset
+	getFunction         func(offset appendOnly.Offset) appendOnly.KeyValuePair
 }
 
 type offsetResult struct {
@@ -67,7 +74,7 @@ func (execution *concurrentExecution) put(pair appendOnly.KeyValuePair) {
 	defer execution.wg.Done()
 
 	execution.offsetResult.mutex.Lock()
-	execution.offsetResult.offsets = append(execution.offsetResult.offsets, execution.log.Put(pair))
+	execution.offsetResult.offsets = append(execution.offsetResult.offsets, execution.putFunction(pair))
 }
 
 func (execution *concurrentExecution) runPutWithIndexedKeyValue(numberOfGoroutines int) {
@@ -85,7 +92,7 @@ func (execution *concurrentExecution) runPutWithIndexedKeyValue(numberOfGoroutin
 func (execution *concurrentExecution) loggedKeyValuePairs() []appendOnly.KeyValuePair {
 	var pairs []appendOnly.KeyValuePair
 	for _, offset := range execution.offsetResult.offsets {
-		pairs = append(pairs, execution.log.GetAtStartingOffset(offset))
+		pairs = append(pairs, execution.getFunction(offset))
 	}
 	return pairs
 }
