@@ -1,7 +1,6 @@
 package appendOnly_test
 
 import (
-	"bytes"
 	"github.com/SarthakMakhija/basics-of-database-design/kv/appendOnly"
 	"os"
 	"testing"
@@ -25,12 +24,8 @@ func TestPutGetKeyPairToKeyValueLog(t *testing.T) {
 	log.Put(keyValuePair)
 
 	readPair := log.GetAtStartingOffset(0)
-	if !bytes.Equal(readPair.Key, keyValuePair.Key) {
-		t.Fatalf("Expected Key %v, received %v", keyValuePair.Key, readPair.Key)
-	}
-
-	if !bytes.Equal(readPair.Value, keyValuePair.Value) {
-		t.Fatalf("Expected Value %v, received %v", keyValuePair.Value, readPair.Value)
+	if !keyValuePair.ContentEquals(readPair) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", keyValuePair.Key, keyValuePair.Value, readPair.Key, readPair.Value)
 	}
 }
 
@@ -53,12 +48,9 @@ func TestPutGetSecondKeyPairToKeyValueLog(t *testing.T) {
 	log.Put(anotherKeyValuePair)
 
 	readPair := log.GetAtStartingOffset(appendOnly.Offset(appendOnly.KeyValueContentSize))
-	if !bytes.Equal(readPair.Key, anotherKeyValuePair.Key) {
-		t.Fatalf("Expected Key %v, received %v", anotherKeyValuePair.Key, readPair.Key)
-	}
 
-	if !bytes.Equal(readPair.Value, anotherKeyValuePair.Value) {
-		t.Fatalf("Expected Value %v, received %v", anotherKeyValuePair.Value, readPair.Value)
+	if !anotherKeyValuePair.ContentEquals(readPair) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", anotherKeyValuePair.Key, anotherKeyValuePair.Value, readPair.Key, readPair.Value)
 	}
 }
 
