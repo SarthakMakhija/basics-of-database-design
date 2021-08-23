@@ -98,3 +98,28 @@ func TestSerializeDeserializeAll(t *testing.T) {
 		t.Fatalf("Expected Key %v, received %v", thirdPair.Value, allPairs[2].Value)
 	}
 }
+
+func TestSerializeLargeKeyValue(t *testing.T) {
+	longContent := func(prefix string) []byte {
+		key := []byte(prefix)
+		for count := 1; count <= 1024; count++ {
+			key = append(key, '0')
+		}
+		return key
+	}
+	pair := appendOnly.KeyValuePair{
+		Key:   longContent("Key"),
+		Value: longContent("Value"),
+	}
+	serialized := pair.Serialize()
+	iterator := appendOnly.NewKeyValuePairIterator(serialized)
+	deserializedPair := iterator.Next()
+
+	if !bytes.Equal(deserializedPair.Key, pair.Key) {
+		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
+	}
+
+	if !bytes.Equal(deserializedPair.Value, pair.Value) {
+		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
+	}
+}
