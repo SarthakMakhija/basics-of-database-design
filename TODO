@@ -1,7 +1,7 @@
 - Check the byte array size in KeyValuePair (NA)
 - Error handling
 - Ensure all file descriptors are closed
-- Handle hardcoded memory mapped file size
+- Handle hardcoded memory mapped file size (done)
 - How to avoid using write system call to write to a memory mapped file (done)
 - Store test for file lock
 - Ensure that entries written to the key/value log file are actually persisted on the physical media (fsync)
