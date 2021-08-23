@@ -127,3 +127,33 @@ func TestHumanReadableValue(t *testing.T) {
 		t.Fatalf("Expected human readable value to be %v, received %v", expected, humanReadableValue)
 	}
 }
+
+func TestReturnsTrueGivenKeyValuePairContentIsSame(t *testing.T) {
+	pair := appendOnly.KeyValuePair{
+		Key:   []byte("Sector"),
+		Value: []byte("512B"),
+	}
+	contentEquals := pair.ContentEquals(appendOnly.KeyValuePair{
+		Key:   []byte("Sector"),
+		Value: []byte("512B"),
+	})
+
+	if contentEquals != true {
+		t.Fatalf("Expected content to be equal in KeyValuePair")
+	}
+}
+
+func TestReturnsFalseGivenKeyValuePairContentIsSame(t *testing.T) {
+	pair := appendOnly.KeyValuePair{
+		Key:   []byte("Sector"),
+		Value: []byte("512B"),
+	}
+	contentEquals := pair.ContentEquals(appendOnly.KeyValuePair{
+		Key:   []byte("Sector"),
+		Value: []byte("512C"),
+	})
+
+	if contentEquals != false {
+		t.Fatalf("Expected content to be not equal in KeyValuePair")
+	}
+}
