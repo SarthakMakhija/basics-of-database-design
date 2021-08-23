@@ -8,4 +8,5 @@
 - See if we need fadvice
 - CRC in log entries
 - Probably missing abstractions like SerializedKeyValue, MemoryMappedFile
-- KeyValuePair should provide behavior to return key/value as strings
+- KeyValuePair should provide behavior to return key/value as strings (done)
+- KeyValuePair should provide contentEquals (done)
