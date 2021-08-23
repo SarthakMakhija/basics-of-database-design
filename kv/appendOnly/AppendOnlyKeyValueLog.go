@@ -32,7 +32,7 @@ func NewKeyValueLog(fileName string) KeyValueLog {
 	}
 
 	fileIO := CreateOrOpenReadWrite(fileName)
-	bytes, isNew := fileIO.Mmap(fileIO.File, 4096)
+	bytes, isNew := fileIO.Mmap(fileIO.File, os.Getpagesize())
 	if fileIO.Err == nil {
 		log := newKeyValueLog(fileIO.File, bytes)
 		if !isNew {
