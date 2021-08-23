@@ -1,7 +1,6 @@
 package appendOnly_test
 
 import (
-	"bytes"
 	"github.com/SarthakMakhija/basics-of-database-design/kv/appendOnly"
 	"testing"
 )
@@ -14,7 +13,7 @@ func TestSerializeKey(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(serialized)
 	deserializedPair := iterator.Next()
 
-	if !bytes.Equal(deserializedPair.Key, pair.Key) {
+	if !pair.ContentEquals(deserializedPair) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
 	}
 }
@@ -27,7 +26,7 @@ func TestSerializeValue(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(serialized)
 	deserializedPair := iterator.Next()
 
-	if !bytes.Equal(deserializedPair.Value, pair.Value) {
+	if !pair.ContentEquals(deserializedPair) {
 		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
 	}
 }
@@ -41,12 +40,8 @@ func TestSerializeKeyValue(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(serialized)
 	deserializedPair := iterator.Next()
 
-	if !bytes.Equal(deserializedPair.Key, pair.Key) {
-		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
-	}
-
-	if !bytes.Equal(deserializedPair.Value, pair.Value) {
-		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
+	if !pair.ContentEquals(deserializedPair) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", pair.Key, pair.Value, deserializedPair.Key, deserializedPair.Value)
 	}
 }
 
@@ -77,25 +72,14 @@ func TestSerializeDeserializeAll(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(finalByteArray)
 	allPairs := iterator.All()
 
-	if !bytes.Equal(allPairs[0].Key, firstPair.Key) {
-		t.Fatalf("Expected Key %v, received %v", firstPair.Key, allPairs[0].Key)
+	if !firstPair.ContentEquals(allPairs[0]) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", firstPair.Key, firstPair.Value, allPairs[0].Key, allPairs[0].Value)
 	}
-	if !bytes.Equal(allPairs[0].Value, firstPair.Value) {
-		t.Fatalf("Expected Key %v, received %v", firstPair.Value, allPairs[0].Value)
+	if !secondPair.ContentEquals(allPairs[1]) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", secondPair.Key, secondPair.Value, allPairs[1].Key, allPairs[1].Value)
 	}
-
-	if !bytes.Equal(allPairs[1].Key, secondPair.Key) {
-		t.Fatalf("Expected Key %v, received %v", secondPair.Key, allPairs[1].Key)
-	}
-	if !bytes.Equal(allPairs[1].Value, secondPair.Value) {
-		t.Fatalf("Expected Key %v, received %v", secondPair.Value, allPairs[1].Value)
-	}
-
-	if !bytes.Equal(allPairs[2].Key, thirdPair.Key) {
-		t.Fatalf("Expected Key %v, received %v", thirdPair.Key, allPairs[2].Key)
-	}
-	if !bytes.Equal(allPairs[2].Value, thirdPair.Value) {
-		t.Fatalf("Expected Key %v, received %v", thirdPair.Value, allPairs[2].Value)
+	if !thirdPair.ContentEquals(allPairs[2]) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", thirdPair.Key, thirdPair.Value, allPairs[2].Key, allPairs[2].Value)
 	}
 }
 
@@ -115,12 +99,8 @@ func TestSerializeLargeKeyValue(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(serialized)
 	deserializedPair := iterator.Next()
 
-	if !bytes.Equal(deserializedPair.Key, pair.Key) {
-		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
-	}
-
-	if !bytes.Equal(deserializedPair.Value, pair.Value) {
-		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
+	if !pair.ContentEquals(deserializedPair) {
+		t.Fatalf("Expected Key %v value %v, received key %v value %v", pair.Key, pair.Value, deserializedPair.Key, deserializedPair.Value)
 	}
 }
 

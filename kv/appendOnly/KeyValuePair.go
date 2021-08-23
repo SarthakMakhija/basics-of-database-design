@@ -1,6 +1,7 @@
 package appendOnly
 
 import (
+	"bytes"
 	"unsafe"
 )
 
@@ -53,6 +54,10 @@ func (keyValuePair KeyValuePair) HumanReadableKey() string {
 
 func (keyValuePair KeyValuePair) HumanReadableValue() string {
 	return string(keyValuePair.Value)
+}
+
+func (keyValuePair KeyValuePair) ContentEquals(other KeyValuePair) bool {
+	return bytes.Equal(keyValuePair.Key, other.Key) && bytes.Equal(keyValuePair.Value, other.Value)
 }
 
 type KeyValuePairIterator struct {
