@@ -123,3 +123,27 @@ func TestSerializeLargeKeyValue(t *testing.T) {
 		t.Fatalf("Expected Value %v, received %v", pair.Value, deserializedPair.Value)
 	}
 }
+
+func TestHumanReadableKey(t *testing.T) {
+	pair := appendOnly.KeyValuePair{
+		Key: []byte("Sector"),
+	}
+	humanReadableKey := pair.HumanReadableKey()
+	expected := "Sector"
+
+	if expected != humanReadableKey {
+		t.Fatalf("Expected human readable key to be %v, received %v", expected, humanReadableKey)
+	}
+}
+
+func TestHumanReadableValue(t *testing.T) {
+	pair := appendOnly.KeyValuePair{
+		Value: []byte("512B"),
+	}
+	humanReadableValue := pair.HumanReadableValue()
+	expected := "512B"
+
+	if expected != humanReadableValue {
+		t.Fatalf("Expected human readable value to be %v, received %v", expected, humanReadableValue)
+	}
+}

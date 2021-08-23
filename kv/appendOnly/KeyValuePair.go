@@ -47,6 +47,14 @@ func (keyValuePair KeyValuePair) isEmpty() bool {
 	return keyValuePair.keySize() == 0
 }
 
+func (keyValuePair KeyValuePair) HumanReadableKey() string {
+	return string(keyValuePair.Key)
+}
+
+func (keyValuePair KeyValuePair) HumanReadableValue() string {
+	return string(keyValuePair.Value)
+}
+
 type KeyValuePairIterator struct {
 	bytes         []byte
 	currentOffset Offset
