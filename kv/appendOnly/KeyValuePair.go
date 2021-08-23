@@ -25,15 +25,15 @@ func (keyValueLogContent keyValueLogContent) isEmpty() bool {
 const KeyValueContentSize = unsafe.Sizeof(keyValueLogContent{})
 
 func (keyValuePair KeyValuePair) Serialize() []byte {
-	bytes := make([]byte, KeyValueContentSize)
-	content := (*keyValueLogContent)(unsafe.Pointer(&bytes[0]))
+	serialized := make([]byte, KeyValueContentSize)
+	content := (*keyValueLogContent)(unsafe.Pointer(&serialized[0]))
 
 	content.keySize = keyValuePair.keySize()
 	content.key = keyValuePair.Key
 	content.valueSize = keyValuePair.valueSize()
 	content.value = keyValuePair.Value
 
-	return bytes
+	return serialized
 }
 
 func (keyValuePair KeyValuePair) keySize() int {
