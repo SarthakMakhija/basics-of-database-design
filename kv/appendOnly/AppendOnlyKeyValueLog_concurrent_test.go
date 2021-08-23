@@ -43,10 +43,10 @@ func TestConcurrentPutInKeyValueLog(t *testing.T) {
 			if bytes.Compare(sourceKeyValuePairs[index].Key, loggedKeyValuePairs[index].Key) != 0 ||
 				bytes.Compare(sourceKeyValuePairs[index].Value, loggedKeyValuePairs[index].Value) != 0 {
 				t.Fatalf("sourceKeyValuePair's key is %v, value is %v, loggedKeyValuePair's key is %v, value is %v",
-					string(sourceKeyValuePairs[index].Key),
-					string(sourceKeyValuePairs[index].Value),
-					string(loggedKeyValuePairs[index].Key),
-					string(loggedKeyValuePairs[index].Value),
+					sourceKeyValuePairs[index].HumanReadableKey(),
+					sourceKeyValuePairs[index].HumanReadableValue(),
+					loggedKeyValuePairs[index].HumanReadableKey(),
+					loggedKeyValuePairs[index].HumanReadableValue(),
 				)
 			}
 		}
