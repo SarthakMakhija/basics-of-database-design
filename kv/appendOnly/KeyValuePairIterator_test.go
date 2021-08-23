@@ -1,7 +1,6 @@
 package appendOnly_test
 
 import (
-	"bytes"
 	"github.com/SarthakMakhija/basics-of-database-design/kv/appendOnly"
 	"testing"
 )
@@ -52,7 +51,7 @@ func TestReturnsNextKeyValuePair(t *testing.T) {
 	iterator := appendOnly.NewKeyValuePairIterator(serialized)
 	deserializedPair := iterator.Next()
 
-	if !bytes.Equal(deserializedPair.Key, pair.Key) {
+	if !pair.ContentEquals(deserializedPair) {
 		t.Fatalf("Expected Key %v, received %v", pair.Key, deserializedPair.Key)
 	}
 }
